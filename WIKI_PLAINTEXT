@@ -1,0 +1,53 @@
+Half-Sleep Mode for Steam Deck
+
+The Half-Sleep Mode package provides a solution to reduce power consumption on the Steam Deck by turning off the screen while Steam downloads are in progress. The package includes three modules:
+
+steam_check.py: A Python script that checks if Steam is currently downloading.
+screen_off.py: A Python script that turns off the screen and waits for any input to turn it back on.
+run_compact_half_sleep.sh: A Bash script that installs the required evdev library and runs the half-sleep mode.
+Setup
+
+Before using the Half-Sleep Mode package, users need to grant execution permission to the shell script:
+
+chmod +x run_compact_half_sleep.sh
+
+Usage
+
+To use the Half-Sleep Mode package, run the run_compact_half_sleep.sh script:
+
+./run_compact_half_sleep.sh
+
+The script will automatically install the evdev library if it is not already installed. It will then check if Steam is downloading. If it is, the half-sleep mode will be activated, turning off the screen. Press any key to turn the screen back on and exit the half-sleep mode.
+
+How it works
+
+steam_check.py
+
+steam_check.py checks if Steam is downloading files by running the following command:
+
+lsof -i | grep steam | grep -i download
+
+If the command returns any output containing the word "steam", it indicates that Steam is downloading files.
+
+screen_off.py
+
+screen_off.py uses the evdev library to detect input events from connected devices such as keyboard, mouse, gamepad, and touchscreen. It creates a separate thread for each device to listen for input events. When an input event is detected, the script sets an input_detected event.
+
+The script then enters a loop, where it continuously checks if Steam is downloading files using the check_steam_downloading function from steam_check.py. If Steam is downloading files or no input is detected, the script turns off the screen using the following command:
+
+sudo xset dpms force off
+
+The loop continues every 5 seconds until either Steam finishes downloading or any input is detected.
+
+run_compact_half_sleep.sh
+
+run_compact_half_sleep.sh is a Bash script that performs the following actions:
+
+Checks if the evdev library is installed. If not, it installs the library using:
+sudo apt-get update
+sudo apt-get install -y python-evdev
+
+Checks if steam_check.py and screen_off.py are present in the current directory. If they are, it runs screen_off.py. If not, it prints an error message and exits.
+Limitations
+
+The current implementation of the Half-Sleep Mode package is designed to work on the Steam Deck with SteamOS, which is based on Arch Linux. The package might not work as intended on other operating systems or devices. The package also relies on the evdev library, which may require additional permissions to access input devices on some systems.
