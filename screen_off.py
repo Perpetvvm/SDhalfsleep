@@ -11,6 +11,7 @@ def listen_for_input(device):
     for event in device.read_loop():
         if event.type == ecodes.EV_KEY or event.type == ecodes.EV_REL or event.type == ecodes.EV_ABS:
             input_detected.set()
+            os.system("qdbus org.kde.Solid.PowerManagement /org/kde/Solid/PowerManagement/PolicyAgent org.kde.Solid.PowerManagement.PolicyAgent.SetPowerManagementEnabled true")
             break
 
 listeners = [threading.Thread(target=listen_for_input, args=(device,)) for device in devices]
